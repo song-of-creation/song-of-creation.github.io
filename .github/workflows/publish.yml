@@ -2,7 +2,7 @@ name: publish-to-github-pages
 on:
   push:
     branches:
-      - master
+      - main
       - release/0.2.x
 
 permissions:
@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 jobs:
