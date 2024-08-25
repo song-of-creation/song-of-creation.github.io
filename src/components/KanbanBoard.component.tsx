@@ -16,43 +16,7 @@ import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
 import { v4 as uuid } from 'uuid';
 
-const initialBoard: KanbanBoard<
-  Card & { link: string; startDate?: string; endDate?: string }
-> = {
-  columns: [
-    {
-      id: '1',
-      title: 'Can Watch',
-      cards: [
-        {
-          id: '12',
-          title: ' Add card Add card Add card Add cardAdd card Add card',
-          link: 'https://legacy.reactjs.org/docs/forms.html'
-        },
-        {
-          id: '23',
-          title: 'Add cardd',
-          link: 'https://legacy.reactjs.org/docs/forms.html'
-        },
-        {
-          id: '34',
-          title: 'https://legacy.reactjs.org/docs/forms.html',
-          link: 'https://legacy.reactjs.org/docs/forms.html'
-        }
-      ]
-    },
-    {
-      id: '2',
-      title: 'Watching',
-      cards: []
-    },
-    {
-      id: '3',
-      title: 'Watched',
-      cards: []
-    }
-  ]
-};
+import boardJSON from './board.json';
 
 export function KanbanBoard() {
   const [board, setBoard] = useState<KanbanBoard<
@@ -62,11 +26,12 @@ export function KanbanBoard() {
   const { error, isLoading, trigger } = usePostBoard(setBoard);
 
   useEffect(() => {
-    fetch('/api/board')
-      .then((res) => res.json())
-      .then((board) => {
-        setBoard(board);
-      });
+    // fetch('/api/board')
+    //   .then((res) => res.json())
+    //   .then((board) => {
+    //     setBoard(board);
+    //   });
+    setBoard(boardJSON);
   }, []);
 
   if (!board || error || isLoading) {
