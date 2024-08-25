@@ -23,15 +23,15 @@ export function usePostBoard(
       Card & { link: string; startDate?: string; endDate?: string }
     >
   ) {
-    // setIsLoading(true);
-    // fetch('/api/board', { method: 'POST', body: JSON.stringify(board) }).then(
-    //   (res) =>
-    //     res.json().then((board) => {
-    //       setBoard(board);
-    //       setIsLoading(false);
-    //     }),
-    //   (reason) => setError(reason)
-    // );
-    setBoard(board);
+    setIsLoading(true);
+    fetch('/api/board', { method: 'POST', body: JSON.stringify(board) }).then(
+      (res) =>
+        res.json().then((board) => {
+          setBoard(board);
+          setIsLoading(false);
+        }),
+      (reason) => setError(reason)
+    );
+    // setBoard(board);
   }
 }

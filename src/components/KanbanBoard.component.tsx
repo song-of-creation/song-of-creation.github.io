@@ -16,8 +16,6 @@ import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
 import { v4 as uuid } from 'uuid';
 
-import boardJSON from './board.json';
-
 export function KanbanBoard() {
   const [board, setBoard] = useState<KanbanBoard<
     Card & { link: string; startDate?: string; endDate?: string }
@@ -26,12 +24,12 @@ export function KanbanBoard() {
   const { error, isLoading, trigger } = usePostBoard(setBoard);
 
   useEffect(() => {
-    // fetch('/api/board')
-    //   .then((res) => res.json())
-    //   .then((board) => {
-    //     setBoard(board);
-    //   });
-    setBoard(boardJSON);
+    fetch('/api/board')
+      .then((res) => res.json())
+      .then((board) => {
+        setBoard(board);
+      });
+    // setBoard(boardJSON);
   }, []);
 
   if (!board || error || isLoading) {
