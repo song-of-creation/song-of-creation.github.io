@@ -1,0 +1,1 @@
+export { usePostBoard } from './usePostBoard';

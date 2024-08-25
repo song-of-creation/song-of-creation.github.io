@@ -1,3 +1,4 @@
+import { usePostBoard } from '@/hooks';
 import type { Card, KanbanBoard } from '@caldwell619/react-kanban';
 import {
   addCard,
@@ -10,7 +11,7 @@ import {
 import '@caldwell619/react-kanban/dist/styles.css';
 import { set } from 'lodash';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
 import { v4 as uuid } from 'uuid';
@@ -54,11 +55,24 @@ const initialBoard: KanbanBoard<
 };
 
 export function KanbanBoard() {
-  const [board, setBoard] =
-    useState<
-      KanbanBoard<Card & { link: string; startDate?: string; endDate?: string }>
-    >(initialBoard);
+  const [board, setBoard] = useState<KanbanBoard<
+    Card & { link: string; startDate?: string; endDate?: string }
+  > | null>(null);
   const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
+  const { error, isLoading, trigger } = usePostBoard(setBoard);
+
+  useEffect(() => {
+    fetch('/api/board')
+      .then((res) => res.json())
+      .then((board) => {
+        setBoard(board);
+      });
+  }, []);
+
+  if (!board || error || isLoading) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col xl:flex-row items-start w-full justify-between">
       <ControlledBoard
@@ -74,9 +88,11 @@ export function KanbanBoard() {
                   {column.id === '1' && (
                     <button
                       onClick={() => {
-                        setBoard((currentBoard) =>
-                          removeCard(currentBoard, column, card)
-                        );
+                        // setBoard((currentBoard) =>
+                        //   removeCard(currentBoard, column, card)
+                        // );
+                        const currentBoard = JSON.parse(JSON.stringify(board));
+                        trigger(removeCard(currentBoard, column, card));
                       }}
                       className="cursor-pointer"
                     >
@@ -114,62 +130,110 @@ export function KanbanBoard() {
           );
         }}
         onCardDragEnd={(_card, source, destination) => {
-          setBoard((currentBoard) => {
-            if (
-              source?.fromColumnId === '1' &&
-              destination?.toColumnId === '2'
-            ) {
-              const columnIdxToChange = currentBoard.columns.findIndex(
-                (col) => col.id === source.fromColumnId
-              );
-              set(
-                currentBoard,
-                [
-                  'columns',
-                  columnIdxToChange,
-                  'cards',
-                  source.fromPosition,
-                  'startDate'
-                ],
-                moment().format('MMM DD YYYY, HH:mm')
-              );
-            } else if (
-              source?.fromColumnId === '2' &&
-              destination?.toColumnId === '3'
-            ) {
-              const columnIdxToChange = currentBoard.columns.findIndex(
-                (col) => col.id === source.fromColumnId
-              );
-              set(
-                currentBoard,
-                [
-                  'columns',
-                  columnIdxToChange,
-                  'cards',
-                  source.fromPosition,
-                  'endDate'
-                ],
-                moment().format('MMM DD YYYY, HH:mm')
-              );
-            } else if (
-              source?.fromColumnId === '1' &&
-              destination?.toColumnId === '3'
-            ) {
-              return currentBoard;
-            }
-            return moveCard(currentBoard, source, destination);
-          });
+          // setBoard((currentBoard) => {
+          //   if (
+          //     source?.fromColumnId === '1' &&
+          //     destination?.toColumnId === '2'
+          //   ) {
+          //     const columnIdxToChange = currentBoard!.columns.findIndex(
+          //       (col) => col.id === source.fromColumnId
+          //     );
+          //     set(
+          //       currentBoard!,
+          //       [
+          //         'columns',
+          //         columnIdxToChange,
+          //         'cards',
+          //         source.fromPosition,
+          //         'startDate'
+          //       ],
+          //       moment().format('MMM DD YYYY, HH:mm')
+          //     );
+          //   } else if (
+          //     source?.fromColumnId === '2' &&
+          //     destination?.toColumnId === '3'
+          //   ) {
+          //     const columnIdxToChange = currentBoard!.columns.findIndex(
+          //       (col) => col.id === source.fromColumnId
+          //     );
+          //     set(
+          //       currentBoard!,
+          //       [
+          //         'columns',
+          //         columnIdxToChange,
+          //         'cards',
+          //         source.fromPosition,
+          //         'endDate'
+          //       ],
+          //       moment().format('MMM DD YYYY, HH:mm')
+          //     );
+          //   } else if (
+          //     source?.fromColumnId === '1' &&
+          //     destination?.toColumnId === '3'
+          //   ) {
+          //     return currentBoard;
+          //   }
+          //   return moveCard(currentBoard, source, destination);
+          // });
+
+          const currentBoard = JSON.parse(JSON.stringify(board));
+          if (source?.fromColumnId === '1' && destination?.toColumnId === '2') {
+            const columnIdxToChange = currentBoard!.columns.findIndex(
+              (col: KanbanBoard<Card>['columns']['0']) =>
+                col.id === source.fromColumnId
+            );
+            set(
+              currentBoard!,
+              [
+                'columns',
+                columnIdxToChange,
+                'cards',
+                source.fromPosition,
+                'startDate'
+              ],
+              moment().format('MMM DD YYYY, HH:mm')
+            );
+          } else if (
+            source?.fromColumnId === '2' &&
+            destination?.toColumnId === '3'
+          ) {
+            const columnIdxToChange = currentBoard!.columns.findIndex(
+              (col: KanbanBoard<Card>['columns']['0']) =>
+                col.id === source.fromColumnId
+            );
+            set(
+              currentBoard!,
+              [
+                'columns',
+                columnIdxToChange,
+                'cards',
+                source.fromPosition,
+                'endDate'
+              ],
+              moment().format('MMM DD YYYY, HH:mm')
+            );
+          } else if (
+            source?.fromColumnId === '1' &&
+            destination?.toColumnId === '3'
+          ) {
+            return;
+          }
+          trigger(moveCard(currentBoard, source, destination));
         }}
         onCardRemove={(info) => {
-          setBoard(removeCard(info.board, info.column, info.card));
+          // setBoard(removeCard(info.board, info.column, info.card));
+          trigger(removeCard(info.board, info.column, info.card));
         }}
         onColumnDragEnd={(_column, source, destination) => {
-          setBoard((currentBoard) => {
-            return moveColumn(currentBoard, source, destination);
-          });
+          // setBoard((currentBoard) => {
+          //   return moveColumn(currentBoard, source, destination);
+          // });
+          const currentBoard = JSON.parse(JSON.stringify(board));
+          trigger(moveColumn(currentBoard, source, destination));
         }}
         onColumnRemove={(info) => {
-          setBoard(removeColumn(info.board, info.column));
+          // setBoard(removeColumn(info.board, info.column));
+          trigger(removeColumn(info.board, info.column));
         }}
         allowAddColumn={false}
         allowRemoveColumn={false}
@@ -197,9 +261,23 @@ export function KanbanBoard() {
           action={undefined}
           onSubmit={(e) => {
             e.preventDefault();
-            setBoard((currentBoard) => {
-              return addCard(
-                currentBoard,
+            // setBoard((currentBoard) => {
+            //   return addCard(
+            //     currentBoard!,
+            //     {
+            //       id: '1'
+            //     },
+            //     {
+            //       id: uuid(),
+            //       title: (e.target as any).title.value,
+            //       link: (e.target as any).link.value
+            //     }
+            //   );
+            // });
+            const currentBoard = JSON.parse(JSON.stringify(board));
+            trigger(
+              addCard(
+                currentBoard!,
                 {
                   id: '1'
                 },
@@ -208,8 +286,8 @@ export function KanbanBoard() {
                   title: (e.target as any).title.value,
                   link: (e.target as any).link.value
                 }
-              );
-            });
+              )
+            );
             setIsAddCardModalOpen(false);
           }}
           className="flex flex-col w-full items-start gap-[15px]"
@@ -242,7 +320,7 @@ export function KanbanBoard() {
   );
 
   function findColumnByCardId(cardId: string) {
-    return board.columns.find(
+    return board!.columns.find(
       (column) => column.cards.filter((card) => card.id === cardId).length > 0
     );
   }
