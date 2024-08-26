@@ -14,7 +14,7 @@ export default function Home() {
 
   return (
     <>
-      <header className="h-[60px] flex items-center p-[10px] border-b-[1px] border-b-solid border-b-[#dddee1] gap-[10px]">
+      <header className="sticky w-full h-[60px] flex items-center p-[10px] border-b-[1px] border-b-solid border-b-[#dddee1] gap-[10px]">
         <Image src="/dashboard-line.svg" alt="icon" width={32} height={32} />
         <span className="text-[24px]">Watchalong</span>
         <button
@@ -24,7 +24,9 @@ export default function Home() {
           Add Show
         </button>
       </header>
-      <main>{isAuthorized && <KanbanBoard />}</main>
+      <main className="overflow-auto h-[calc(100%-60px)]">
+        {isAuthorized && <KanbanBoard />}
+      </main>
       <Modal
         open={isAddCardModalOpen}
         onClose={() => setIsAddCardModalOpen(false)}
