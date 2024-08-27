@@ -24,6 +24,12 @@ export function KanbanBoard() {
   const [editingCard, setEditingCard] = useState<
     (Card & { link: string; startDate?: string; endDate?: string }) | null
   >(null);
+  const [editingColumn, setEditingColumn] = useState<
+    | KanbanBoard<
+        Card & { link: string; startDate?: string; endDate?: string }
+      >['columns']['0']
+    | null
+  >(null);
   const { error, isLoading, trigger } = usePostBoard(setBoard);
 
   useEffect(() => {
@@ -32,33 +38,7 @@ export function KanbanBoard() {
       .then((board) => {
         setBoard(board);
       });
-    // setBoard({
-    //   columns: [
-    //     {
-    //       id: '1',
-    //       title: 'Can Watch',
-    //       cards: [
-    //         {
-    //           id: '2c0f0a6a-e206-4e79-be10-cea2e3dd5697',
-    //           title: 'Yuru Camp Season 2',
-    //           link: 'https://anilist.co/anime/104459/Yuru-Camp-SEASON-2/',
-    //           startDate: 'Aug 25 2024, 17:19',
-    //           endDate: 'Aug 25 2024, 17:20'
-    //         }
-    //       ]
-    //     },
-    //     {
-    //       id: '2',
-    //       title: 'Watching',
-    //       cards: []
-    //     },
-    //     {
-    //       id: '3',
-    //       title: 'Watched',
-    //       cards: []
-    //     }
-    //   ]
-    // });
+    // setBoard(initialBoard);
   }, []);
 
   useEffect(() => {
@@ -99,10 +79,15 @@ export function KanbanBoard() {
       <ControlledBoard
         renderCard={(card) => {
           const column = findColumnByCardId(`${card.id}`)!;
+          const startDate = moment(card?.startDate);
+          const endDate = moment(card?.endDate);
           return (
             <div
               className="bg-[#fff] p-[10px] w-full max-w-[350px] mb-[10px]"
-              onClick={() => setEditingCard(card)}
+              onClick={() => {
+                setEditingCard(card);
+                setEditingColumn(findColumnByCardId(`${card.id}`)!);
+              }}
             >
               <span>
                 <div className="border-b-solid border-b-[1px] border-b-[#eee] pb-[5px] font-bold flex justify-between">
@@ -140,13 +125,21 @@ export function KanbanBoard() {
                   {column.id !== '1' && (
                     <div className="flex flex-col">
                       Start Date:
-                      <span>{card.startDate}</span>
+                      <span>
+                        {startDate.isValid()
+                          ? startDate.format('MMM DD YYYY, HH:mm')
+                          : '-'}
+                      </span>
                     </div>
                   )}
                   {column.id === '3' && (
                     <div className="flex flex-col">
                       End Date:
-                      <span>{card.endDate}</span>
+                      <span>
+                        {endDate.isValid()
+                          ? endDate.format('MMM DD YYYY, HH:mm')
+                          : '-'}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -292,7 +285,10 @@ export function KanbanBoard() {
       </ControlledBoard>
       <Modal
         open={!!editingCard}
-        onClose={() => setEditingCard(null)}
+        onClose={() => {
+          setEditingCard(null);
+          setEditingColumn(null);
+        }}
         classNames={{
           modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)]',
           modalContainer: '[&&]:overflow-x-auto'
@@ -304,24 +300,25 @@ export function KanbanBoard() {
           onSubmit={(e) => {
             e.preventDefault();
             const currentBoard = JSON.parse(JSON.stringify(board));
+            const startDate = moment((e.target as any)?.startDate?.value);
+            const endDate = moment((e.target as any)?.endDate?.value);
             trigger(
               changeCard(currentBoard!, editingCard?.id, {
                 id: uuid(),
                 title: (e.target as any)?.title?.value,
                 link: (e.target as any)?.link?.value,
-                startDate: (e.target as any)?.startDate?.value
-                  ? moment((e.target as any)?.startDate?.value).format(
-                      'MMM DD YYYY, HH:mm'
-                    )
-                  : '-',
-                endDate: (e.target as any)?.endDate?.value
-                  ? moment((e.target as any)?.endDate?.value).format(
-                      'MMM DD YYYY, HH:mm'
-                    )
-                  : '-'
+                startDate:
+                  editingColumn?.id !== '1' && startDate.isValid()
+                    ? startDate.format('MMM DD YYYY, HH:mm')
+                    : '',
+                endDate:
+                  editingColumn?.id === '3' && endDate.isValid()
+                    ? endDate.format('MMM DD YYYY, HH:mm')
+                    : '-'
               })
             );
             setEditingCard(null);
+            setEditingColumn(null);
           }}
           className="flex flex-col w-full items-start gap-[15px]"
         >
@@ -347,7 +344,7 @@ export function KanbanBoard() {
               className="border-solid border-[1px] border-[#000] p-[2px]"
             />
           </label>
-          {!!editingCard?.startDate && (
+          {editingColumn?.id !== '1' && (
             <label className="w-full flex flex-col">
               Start Date
               <input
@@ -360,7 +357,7 @@ export function KanbanBoard() {
               />
             </label>
           )}
-          {!!editingCard?.endDate && (
+          {editingColumn?.id === '3' && (
             <label className="w-full flex flex-col">
               End Date
               <input
