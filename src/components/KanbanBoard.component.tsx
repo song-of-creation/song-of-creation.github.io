@@ -15,6 +15,7 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
+import { GridLoader } from 'react-spinners';
 import { v4 as uuid } from 'uuid';
 
 export function KanbanBoard() {
@@ -30,15 +31,10 @@ export function KanbanBoard() {
       >['columns']['0']
     | null
   >(null);
-  const { error, isLoading, trigger } = usePostBoard(setBoard);
+  const { fetchBoard, error, isLoading, trigger } = usePostBoard(setBoard);
 
   useEffect(() => {
-    fetch('/api/board')
-      .then((res) => res.json())
-      .then((board) => {
-        setBoard(board);
-      });
-    // setBoard(initialBoard);
+    fetchBoard();
   }, []);
 
   useEffect(() => {
@@ -70,8 +66,20 @@ export function KanbanBoard() {
     }
   }, [board]);
 
-  if (!board || error || isLoading) {
+  if (!board || error) {
     return null;
+  }
+
+  if (isLoading) {
+    return (
+      <GridLoader
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        color="#000"
+        size={25}
+        aria-label="Loading Spinner"
+        loading
+      />
+    );
   }
 
   return (

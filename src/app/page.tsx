@@ -11,6 +11,7 @@ export default function Home() {
   const [isAuthorizationModalOpen, setIsAuthorizationModalOpen] =
     useState(true);
   const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   return (
     <>
@@ -23,8 +24,16 @@ export default function Home() {
         >
           Add Show
         </button>
+        <Image
+          src="/question-line.svg"
+          alt="icon"
+          width={32}
+          height={32}
+          className="ml-auto cursor-pointer"
+          onClick={() => setIsHelpModalOpen(true)}
+        />
       </header>
-      <main className="overflow-auto h-[calc(100%-60px)]">
+      <main className="overflow-auto h-[calc(100%-60px)] relative">
         {isAuthorized && <KanbanBoard />}
       </main>
       <Modal
@@ -124,6 +133,49 @@ export default function Home() {
             Submit
           </button>
         </form>
+      </Modal>
+      <Modal
+        open={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+        classNames={{
+          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)]',
+          modalContainer: '[&&]:overflow-x-auto'
+        }}
+        center
+      >
+        <h2 className="font-bold text-center text-[18px]">Help</h2>
+        <ul className="text-[16px] list-disc m-[inherit] p-[inherit]">
+          <li>There are only 3 columns: Can Watch, Watching, and Watched.</li>
+          <li>
+            You can add a show to Can Watch by pressing the Add Show button at
+            the top and completing the information.
+          </li>
+          <li>
+            You can drag and drop a show to Watching when we start watching the
+            show. It will automatically add a start date from the moment you
+            moved the show.
+          </li>
+          <li>
+            You can drag and drop a show to Watched when we either finish
+            watching the show, or when we drop it. It will automatically add an
+            end date from the moment you moved the show.
+          </li>
+          <li>
+            You can remove shows from the board but only the ones from Can
+            Watch. To remove ones from other columns, you have to drag and drop
+            them to Can Watch.
+          </li>
+          <li>
+            You can edit the information of an existing show by clicking on it
+            and completing the information.
+          </li>
+          <li>
+            For better readability, all shows are automatically sorted starting
+            from the most recent finished show to the oldest finished show. When
+            the finish date doesn&apos;t exist, the sorting is done starting
+            from the most recent started show to the oldest started show.
+          </li>
+        </ul>
       </Modal>
     </>
   );

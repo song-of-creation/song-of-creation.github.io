@@ -17,7 +17,26 @@ export function usePostBoard(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  return { trigger, isLoading, error };
+  return { fetchBoard, trigger, isLoading, error };
+
+  function fetchBoard() {
+    setIsLoading(true);
+    fetch('/api/board')
+      .then(
+        (res) => res.json(),
+        (reason) => {
+          setError(reason);
+        }
+      )
+      .then((board) => {
+        setBoard(board);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        setError(e);
+      });
+    // setBoard(initialBoard);
+  }
 
   function trigger(
     board: KanbanBoard<
@@ -37,8 +56,12 @@ export function usePostBoard(
         }),
       (reason) => setError(reason)
     );
+    // setIsLoading(true);
     // const sortedBoard = sortCards(board);
     // setBoard(sortedBoard);
+    // setTimeout(() => {
+    //   setIsLoading(false);
+    // }, 1000);
   }
 
   function sortCards(
