@@ -309,12 +309,16 @@ export function KanbanBoard() {
                 id: uuid(),
                 title: (e.target as any)?.title?.value,
                 link: (e.target as any)?.link?.value,
-                startDate: moment((e.target as any)?.startDate?.value).format(
-                  'MMM DD YYYY, HH:mm'
-                ),
-                endDate: moment((e.target as any)?.endDate?.value).format(
-                  'MMM DD YYYY, HH:mm'
-                )
+                startDate: (e.target as any)?.startDate?.value
+                  ? moment((e.target as any)?.startDate?.value).format(
+                      'MMM DD YYYY, HH:mm'
+                    )
+                  : '-',
+                endDate: (e.target as any)?.endDate?.value
+                  ? moment((e.target as any)?.endDate?.value).format(
+                      'MMM DD YYYY, HH:mm'
+                    )
+                  : '-'
               })
             );
             setEditingCard(null);
