@@ -31,7 +31,8 @@ export default function Home() {
         open={isAddCardModalOpen}
         onClose={() => setIsAddCardModalOpen(false)}
         classNames={{
-          modal: 'w-[600px]'
+          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)]',
+          modalContainer: '[&&]:overflow-x-auto'
         }}
         center
       >
@@ -85,7 +86,8 @@ export default function Home() {
         open={isAuthorizationModalOpen}
         onClose={() => {}}
         classNames={{
-          modal: 'w-[600px]'
+          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)]',
+          modalContainer: '[&&]:overflow-x-auto'
         }}
         center
       >

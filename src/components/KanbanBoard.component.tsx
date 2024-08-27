@@ -294,7 +294,8 @@ export function KanbanBoard() {
         open={!!editingCard}
         onClose={() => setEditingCard(null)}
         classNames={{
-          modal: 'w-[600px]'
+          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)]',
+          modalContainer: '[&&]:overflow-x-auto'
         }}
         center
       >
