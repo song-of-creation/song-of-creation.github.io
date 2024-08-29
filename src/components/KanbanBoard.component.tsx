@@ -85,13 +85,21 @@ export function KanbanBoard() {
   return (
     <>
       <ControlledBoard
+        renderColumnHeader={(column) => {
+          return (
+            <span className="uppercase truncate block text-[#777] font-bold pl-[5px] pt-[10px] pb-[20px]">
+              {column?.title}
+              <span className="ml-[10px]">{column?.cards?.length}</span>
+            </span>
+          );
+        }}
         renderCard={(card) => {
           const column = findColumnByCardId(`${card.id}`)!;
           const startDate = moment(card?.startDate);
           const endDate = moment(card?.endDate);
           return (
             <div
-              className="bg-[#fff] p-[10px] w-full max-w-[350px] mb-[10px]"
+              className="bg-[#fff] p-[10px] w-full mb-[10px] rounded-[4px]"
               onClick={() => {
                 setEditingCard(card);
                 setEditingColumn(findColumnByCardId(`${card.id}`)!);
@@ -99,7 +107,7 @@ export function KanbanBoard() {
             >
               <span>
                 <div className="border-b-solid border-b-[1px] border-b-[#eee] pb-[5px] font-bold flex justify-between">
-                  <span className="truncate max-w-[calc(100%-15px)] whitespace-pre-wrap">
+                  <span className="truncate whitespace-pre-wrap">
                     {card.title}
                   </span>
                   {column.id === '1' && (
@@ -109,7 +117,7 @@ export function KanbanBoard() {
                         const currentBoard = JSON.parse(JSON.stringify(board));
                         trigger(removeCard(currentBoard, column, card));
                       }}
-                      className="cursor-pointer"
+                      className="cursor-pointer rounded-[4px]"
                     >
                       X
                     </button>
@@ -298,7 +306,7 @@ export function KanbanBoard() {
           setEditingColumn(null);
         }}
         classNames={{
-          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)]',
+          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)] rounded-[4px]',
           modalContainer: '[&&]:overflow-x-auto'
         }}
         center
@@ -338,7 +346,7 @@ export function KanbanBoard() {
               defaultValue={editingCard?.title ?? ''}
               type="text"
               name="title"
-              className="border-solid border-[1px] border-[#000] p-[2px]"
+              className="border-solid border-[1px] border-[#000] p-[2px] rounded-[4px]"
             />
           </label>
           <label className="w-full flex flex-col">
@@ -349,7 +357,7 @@ export function KanbanBoard() {
               defaultValue={editingCard?.link ?? ''}
               type="text"
               name="link"
-              className="border-solid border-[1px] border-[#000] p-[2px]"
+              className="border-solid border-[1px] border-[#000] p-[2px] rounded-[4px]"
             />
           </label>
           {editingColumn?.id !== '1' && (
@@ -361,7 +369,7 @@ export function KanbanBoard() {
                 )}
                 type="datetime-local"
                 name="startDate"
-                className="border-solid border-[1px] border-[#000] p-[2px]"
+                className="border-solid border-[1px] border-[#000] p-[2px] rounded-[4px]"
               />
             </label>
           )}
@@ -374,13 +382,13 @@ export function KanbanBoard() {
                 )}
                 type="datetime-local"
                 name="endDate"
-                className="border-solid border-[1px] border-[#000] p-[2px]"
+                className="border-solid border-[1px] border-[#000] p-[2px] rounded-[4px]"
               />
             </label>
           )}
           <button
             type="submit"
-            className="border-solid border-[1px] border-[#000] p-[6px] bg-[#e0e0e0] mt-[15px]"
+            className="border-solid border-[1px] border-[#000] p-[6px] bg-[#e0e0e0] mt-[15px] rounded-[4px]"
           >
             Edit Show
           </button>

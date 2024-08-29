@@ -40,7 +40,7 @@ export default function Home() {
         open={isAddCardModalOpen}
         onClose={() => setIsAddCardModalOpen(false)}
         classNames={{
-          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)]',
+          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)] rounded-[4px]',
           modalContainer: '[&&]:overflow-x-auto'
         }}
         center
@@ -68,7 +68,7 @@ export default function Home() {
             <input
               type="text"
               name="title"
-              className="border-solid border-[1px] border-[#000] p-[2px]"
+              className="border-solid border-[1px] border-[#000] p-[2px] rounded-[4px]"
               required
             />
           </label>
@@ -79,13 +79,13 @@ export default function Home() {
             <input
               type="text"
               name="link"
-              className="border-solid border-[1px] border-[#000] p-[2px]"
+              className="border-solid border-[1px] border-[#000] p-[2px] rounded-[4px]"
               required
             />
           </label>
           <button
             type="submit"
-            className="border-solid border-[1px] border-[#000] p-[6px] bg-[#e0e0e0] mt-[15px]"
+            className="border-solid border-[1px] border-[#000] p-[6px] bg-[#e0e0e0] mt-[15px] rounded-[4px]"
           >
             Add Show
           </button>
@@ -95,7 +95,7 @@ export default function Home() {
         open={isAuthorizationModalOpen}
         onClose={() => {}}
         classNames={{
-          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)]',
+          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)] rounded-[4px]',
           modalContainer: '[&&]:overflow-x-auto'
         }}
         center
@@ -122,13 +122,13 @@ export default function Home() {
             <input
               type="text"
               name="password"
-              className="border-solid border-[1px] border-[#000] p-[2px]"
+              className="border-solid border-[1px] border-[#000] p-[2px] rounded-[4px]"
               required
             />
           </label>
           <button
             type="submit"
-            className="border-solid border-[1px] border-[#000] p-[6px] bg-[#e0e0e0] mt-[15px]"
+            className="border-solid border-[1px] border-[#000] p-[6px] bg-[#e0e0e0] mt-[15px] rounded-[4px]"
           >
             Submit
           </button>
@@ -138,7 +138,7 @@ export default function Home() {
         open={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
         classNames={{
-          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)]',
+          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)] rounded-[4px]',
           modalContainer: '[&&]:overflow-x-auto'
         }}
         center

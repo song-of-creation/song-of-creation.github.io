@@ -2,14 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  @font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(/Roboto.woff2) format('woff2');
+  }
+
+  html {
+    font-family: 'Roboto';
+  }
+}
+
 .react-kanban-board > div {
   width: 100%;
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .react-kanban-board > div > div {
   min-width: 50px !important;
+  padding: 5px;
+  border-radius: 4px;
 }
 
 .react-kanban-board > div > div > div:nth-child(2) > div > div {
