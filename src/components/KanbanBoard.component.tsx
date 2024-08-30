@@ -95,11 +95,9 @@ export function KanbanBoard() {
         }}
         renderCard={(card) => {
           const column = findColumnByCardId(`${card.id}`)!;
-          const startDate = moment(card?.startDate);
-          const endDate = moment(card?.endDate);
           return (
             <div
-              className="bg-[#fff] p-[10px] w-full mb-[10px] rounded-[4px]"
+              className="bg-[#fff] p-[10px] w-full mb-[10px] rounded-[4px] hover:bg-[rgba(255,171,0,0.10)]"
               onClick={() => {
                 setEditingCard(card);
                 setEditingColumn(findColumnByCardId(`${card.id}`)!);
@@ -126,38 +124,15 @@ export function KanbanBoard() {
               </span>
               <div className="pt-[10px]">
                 <div className="flex flex-col w-full gap-[10px]">
-                  <div className="flex flex-col">
-                    Link:
-                    <a
-                      href={card.link}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                      className="underline text-blue-500 truncate"
-                    >
-                      {card.link}
-                    </a>
-                  </div>
-                  {column.id !== '1' && (
-                    <div className="flex flex-col">
-                      Start Date:
-                      <span>
-                        {startDate.isValid()
-                          ? startDate.format('MMM DD YYYY, HH:mm')
-                          : '-'}
-                      </span>
-                    </div>
-                  )}
-                  {column.id === '3' && (
-                    <div className="flex flex-col">
-                      End Date:
-                      <span>
-                        {endDate.isValid()
-                          ? endDate.format('MMM DD YYYY, HH:mm')
-                          : '-'}
-                      </span>
-                    </div>
-                  )}
+                  <a
+                    href={card.link}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className="underline text-blue-500 truncate"
+                  >
+                    {card.link}
+                  </a>
                 </div>
               </div>
             </div>
@@ -296,6 +271,7 @@ export function KanbanBoard() {
         allowRenameColumn={false}
         allowAddCard={false}
         allowRemoveCard
+        disableColumnDrag
       >
         {board}
       </ControlledBoard>
