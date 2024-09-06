@@ -12,13 +12,19 @@ import {
 import '@caldwell619/react-kanban/dist/styles.css';
 import { set } from 'lodash';
 import moment from 'moment';
+import Image from 'next/image';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
 import { GridLoader } from 'react-spinners';
 import { v4 as uuid } from 'uuid';
 
-export function KanbanBoard() {
+interface Props {
+  openedCardId: string | null;
+}
+
+export function KanbanBoard({ openedCardId }: Readonly<Props>) {
   const [board, setBoard] = useState<KanbanBoard<
     Card & { link: string; startDate?: string; endDate?: string }
   > | null>(null);
@@ -32,9 +38,19 @@ export function KanbanBoard() {
     | null
   >(null);
   const { fetchBoard, error, isLoading, trigger } = usePostBoard(setBoard);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   useEffect(() => {
-    fetchBoard();
+    fetchBoard()
+      .then((board) => {
+        if (openedCardId && board) {
+          setEditingCard(findCardByCardId(openedCardId, board)!);
+          setEditingColumn(findColumnByCardId(`${openedCardId}`, board)!);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -101,6 +117,9 @@ export function KanbanBoard() {
               onClick={() => {
                 setEditingCard(card);
                 setEditingColumn(findColumnByCardId(`${card.id}`)!);
+                const queryParams = new URLSearchParams(searchParams);
+                queryParams.set('openedCardId', `${card?.id ?? ''}`);
+                router.replace(`${pathname}?${queryParams.toString()}`);
               }}
             >
               <span>
@@ -108,18 +127,43 @@ export function KanbanBoard() {
                   <span className="truncate whitespace-pre-wrap">
                     {card.title}
                   </span>
-                  {column.id === '1' && (
+                  <div className="flex gap-[6px] ml-[6px]">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        const currentBoard = JSON.parse(JSON.stringify(board));
-                        trigger(removeCard(currentBoard, column, card));
+                        const queryParams = new URLSearchParams();
+                        queryParams.set('openedCardId', `${card?.id ?? ''}`);
+                        const url = `${
+                          window.location.origin
+                        }${pathname}?${queryParams.toString()}`;
+                        navigator.clipboard.writeText(url);
+                        alert('Copied the show link');
                       }}
                       className="cursor-pointer rounded-[4px]"
                     >
-                      X
+                      <Image
+                        className="min-w-[16px]"
+                        src="/share-line.svg"
+                        alt="icon"
+                        width={16}
+                        height={16}
+                      />
                     </button>
-                  )}
+                    {column.id === '1' && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const currentBoard = JSON.parse(
+                            JSON.stringify(board)
+                          );
+                          trigger(removeCard(currentBoard, column, card));
+                        }}
+                        className="cursor-pointer rounded-[4px]"
+                      >
+                        X
+                      </button>
+                    )}
+                  </div>
                 </div>
               </span>
               <div className="pt-[10px]">
@@ -276,7 +320,7 @@ export function KanbanBoard() {
         {board}
       </ControlledBoard>
       <Modal
-        open={!!editingCard}
+        open={!!editingCard && !!editingColumn}
         onClose={() => {
           setEditingCard(null);
           setEditingColumn(null);
@@ -373,8 +417,23 @@ export function KanbanBoard() {
     </>
   );
 
-  function findColumnByCardId(cardId: string) {
-    return board!.columns.find(
+  function findCardByCardId(
+    cardId: string,
+    customBoard?: KanbanBoard<
+      Card & { link: string; startDate?: string; endDate?: string }
+    >
+  ) {
+    const column = findColumnByCardId(cardId, customBoard);
+    return column?.cards?.find((card) => card?.id === cardId);
+  }
+
+  function findColumnByCardId(
+    cardId: string,
+    customBoard?: KanbanBoard<
+      Card & { link: string; startDate?: string; endDate?: string }
+    >
+  ) {
+    return (customBoard ?? board)!.columns.find(
       (column) => column.cards.filter((card) => card.id === cardId).length > 0
     );
   }

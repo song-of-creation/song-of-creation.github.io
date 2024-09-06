@@ -21,21 +21,25 @@ export function usePostBoard(
 
   function fetchBoard() {
     setIsLoading(true);
-    fetch('/api/board')
+    return fetch('/api/board')
       .then(
         (res) => res.json(),
         (reason) => {
           setError(reason);
+          return Promise.reject(reason);
         }
       )
       .then((board) => {
         setBoard(board);
         setIsLoading(false);
+        return Promise.resolve(board);
       })
       .catch((e) => {
         setError(e);
+        return Promise.reject(error);
       });
     // setBoard(initialBoard);
+    // return Promise.resolve(initialBoard);
   }
 
   function trigger(
@@ -44,7 +48,6 @@ export function usePostBoard(
     >
   ) {
     setIsLoading(true);
-
     fetch('/api/board', {
       method: 'POST',
       body: JSON.stringify(sortCards(board))

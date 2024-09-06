@@ -1,17 +1,31 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 
 import { KanbanBoard } from '@/components';
 
+const appPassword = process.env.NEXT_PUBLIC_PASSWORD;
+
 export default function Home() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isAuthorizationModalOpen, setIsAuthorizationModalOpen] =
-    useState(true);
+    useState(false);
   const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const openedCardId = searchParams.get('openedCardId');
+
+  useEffect(() => {
+    const password = localStorage.getItem('watchalong::password');
+    if (password !== appPassword) {
+      setIsAuthorizationModalOpen(true);
+    } else {
+      setIsAuthorized(true);
+    }
+  }, []);
 
   return (
     <>
@@ -34,7 +48,7 @@ export default function Home() {
         />
       </header>
       <main className="overflow-auto h-[calc(100%-60px)] relative">
-        {isAuthorized && <KanbanBoard />}
+        {isAuthorized && <KanbanBoard openedCardId={openedCardId} />}
       </main>
       <Modal
         open={isAddCardModalOpen}
@@ -104,14 +118,17 @@ export default function Home() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (
-              (e.target as any)?.password?.value !==
-              process.env.NEXT_PUBLIC_PASSWORD
-            ) {
+            if ((e.target as any)?.password?.value !== appPassword) {
               return;
             }
             setIsAuthorized(true);
             setIsAuthorizationModalOpen(false);
+            try {
+              localStorage.setItem(
+                'watchalong::password',
+                (e.target as any)?.password?.value
+              );
+            } catch {}
           }}
           className="flex flex-col w-full items-start gap-[15px]"
         >
