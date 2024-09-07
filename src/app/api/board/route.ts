@@ -9,7 +9,7 @@ type Error = {
 export async function GET() {
   try {
     // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-    const client = new MongoClient(process.env.DB_COLLECTION_STRING!, {
+    const client = new MongoClient(process.env.DB_CONNECTION_STRING!, {
       serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
@@ -44,7 +44,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-    const client = new MongoClient(process.env.DB_COLLECTION_STRING!, {
+    const client = new MongoClient(process.env.DB_CONNECTION_STRING!, {
       serverApi: {
         version: ServerApiVersion.v1,
         strict: true,

@@ -38,8 +38,6 @@ export function useBoardApiRequests(
         setError(e);
         return Promise.reject(error);
       });
-    // setBoard(initialBoard);
-    // return Promise.resolve(initialBoard);
   }
 
   function putBoard(
@@ -59,12 +57,6 @@ export function useBoardApiRequests(
         }),
       (reason) => setError(reason)
     );
-    // setIsLoading(true);
-    // const sortedBoard = sortCards(board);
-    // setBoard(sortedBoard);
-    // setTimeout(() => {
-    //   setIsLoading(false);
-    // }, 1000);
   }
 
   function sortCards(
