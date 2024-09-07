@@ -49,7 +49,7 @@ export function useBoardApiRequests(
   ) {
     setIsLoading(true);
     fetch('/api/board', {
-      method: 'PUT',
+      method: 'POST',
       body: JSON.stringify(sortCards(board))
     }).then(
       (res) =>
