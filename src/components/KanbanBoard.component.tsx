@@ -1,4 +1,3 @@
-import { usePostBoard } from '@/hooks';
 import type { Card, KanbanBoard } from '@caldwell619/react-kanban';
 import {
   addCard,
@@ -10,21 +9,28 @@ import {
   removeColumn
 } from '@caldwell619/react-kanban';
 import '@caldwell619/react-kanban/dist/styles.css';
+import classNames from 'classnames';
 import { set } from 'lodash';
 import moment from 'moment';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
-import 'react-responsive-modal/styles.css';
 import { GridLoader } from 'react-spinners';
 import { v4 as uuid } from 'uuid';
 
+import { useBoardApiRequests } from '@/hooks';
+import type { Notification } from './kanbanBoardTypes';
+
 interface Props {
   openedCardId: string | null;
+  showNotification: (notification: Notification | null) => void;
 }
 
-export function KanbanBoard({ openedCardId }: Readonly<Props>) {
+export function KanbanBoard({
+  openedCardId,
+  showNotification
+}: Readonly<Props>) {
   const [board, setBoard] = useState<KanbanBoard<
     Card & { link: string; startDate?: string; endDate?: string }
   > | null>(null);
@@ -37,13 +43,14 @@ export function KanbanBoard({ openedCardId }: Readonly<Props>) {
       >['columns']['0']
     | null
   >(null);
-  const { fetchBoard, error, isLoading, trigger } = usePostBoard(setBoard);
+  const { getBoard, error, isLoading, putBoard } =
+    useBoardApiRequests(setBoard);
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
   useEffect(() => {
-    fetchBoard()
+    getBoard()
       .then((board) => {
         if (openedCardId && board) {
           setEditingCard(findCardByCardId(openedCardId, board)!);
@@ -66,7 +73,7 @@ export function KanbanBoard({ openedCardId }: Readonly<Props>) {
     };
     function handleAddCardEvent(e: CustomEvent) {
       const currentBoard = JSON.parse(JSON.stringify(board));
-      trigger(
+      putBoard(
         addCard(
           currentBoard!,
           {
@@ -113,7 +120,13 @@ export function KanbanBoard({ openedCardId }: Readonly<Props>) {
           const column = findColumnByCardId(`${card.id}`)!;
           return (
             <div
-              className="bg-[#fff] p-[10px] w-full mb-[10px] rounded-[4px] hover:bg-[rgba(255,171,0,0.10)]"
+              className={classNames(
+                'p-[10px] w-full mb-[10px] rounded-[4px] hover:bg-[#e6f4ff]',
+                {
+                  'bg-[#e6f4ff]': editingCard?.id === card.id,
+                  'bg-[#fff]': editingCard?.id !== card.id
+                }
+              )}
               onClick={() => {
                 setEditingCard(card);
                 setEditingColumn(findColumnByCardId(`${card.id}`)!);
@@ -127,7 +140,7 @@ export function KanbanBoard({ openedCardId }: Readonly<Props>) {
                   <span className="truncate whitespace-pre-wrap">
                     {card.title}
                   </span>
-                  <div className="flex gap-[6px] ml-[6px]">
+                  <div className="flex gap-[4px] ml-[6px]">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -137,9 +150,23 @@ export function KanbanBoard({ openedCardId }: Readonly<Props>) {
                           window.location.origin
                         }${pathname}?${queryParams.toString()}`;
                         navigator.clipboard.writeText(url);
-                        alert('Copied the show link');
+                        showNotification({
+                          type: 'info',
+                          message: (
+                            <div className="flex items-center w-full">
+                              <span className="font-bold mr-[4px]">✓</span>
+                              Copied to clipboard!
+                              <button
+                                className="font-semibold text-[20px] ml-[auto]"
+                                onClick={() => showNotification(null)}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          )
+                        });
                       }}
-                      className="cursor-pointer rounded-[4px]"
+                      className="cursor-pointer rounded-[4px] hover:bg-[#cbe1ff]"
                     >
                       <Image
                         className="min-w-[16px]"
@@ -156,11 +183,11 @@ export function KanbanBoard({ openedCardId }: Readonly<Props>) {
                           const currentBoard = JSON.parse(
                             JSON.stringify(board)
                           );
-                          trigger(removeCard(currentBoard, column, card));
+                          putBoard(removeCard(currentBoard, column, card));
                         }}
-                        className="cursor-pointer rounded-[4px]"
+                        className="cursor-pointer rounded-[4px] text-[20px] leading-[16px] hover:bg-[#cbe1ff] w-[16px]"
                       >
-                        X
+                        ×
                       </button>
                     )}
                   </div>
@@ -298,17 +325,17 @@ export function KanbanBoard({ openedCardId }: Readonly<Props>) {
               moment().format('MMM DD YYYY, HH:mm')
             );
           }
-          trigger(moveCard(currentBoard, source, destination));
+          putBoard(moveCard(currentBoard, source, destination));
         }}
         onCardRemove={(info) => {
-          trigger(removeCard(info.board, info.column, info.card));
+          putBoard(removeCard(info.board, info.column, info.card));
         }}
         onColumnDragEnd={(_column, source, destination) => {
           const currentBoard = JSON.parse(JSON.stringify(board));
-          trigger(moveColumn(currentBoard, source, destination));
+          putBoard(moveColumn(currentBoard, source, destination));
         }}
         onColumnRemove={(info) => {
-          trigger(removeColumn(info.board, info.column));
+          putBoard(removeColumn(info.board, info.column));
         }}
         allowAddColumn={false}
         allowRemoveColumn={false}
@@ -338,7 +365,7 @@ export function KanbanBoard({ openedCardId }: Readonly<Props>) {
             const currentBoard = JSON.parse(JSON.stringify(board));
             const startDate = moment((e.target as any)?.startDate?.value);
             const endDate = moment((e.target as any)?.endDate?.value);
-            trigger(
+            putBoard(
               changeCard(currentBoard!, editingCard?.id, {
                 id: uuid(),
                 title: (e.target as any)?.title?.value,

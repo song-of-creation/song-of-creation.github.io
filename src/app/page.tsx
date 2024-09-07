@@ -1,10 +1,12 @@
 'use client';
 
+import classNames from 'classnames';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-responsive-modal';
 
+import type { Notification } from '@/components';
 import { KanbanBoard } from '@/components';
 
 const appPassword = process.env.NEXT_PUBLIC_PASSWORD;
@@ -17,6 +19,7 @@ export default function Home() {
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const searchParams = useSearchParams();
   const openedCardId = searchParams.get('openedCardId');
+  const [notification, setNotification] = useState<Notification | null>(null);
 
   useEffect(() => {
     const password = localStorage.getItem('watchalong::password');
@@ -29,26 +32,59 @@ export default function Home() {
 
   return (
     <>
-      <header className="sticky w-full h-[60px] flex items-center p-[10px] border-b-[1px] border-b-solid border-b-[#dddee1] gap-[10px]">
-        <Image src="/dashboard-line.svg" alt="icon" width={32} height={32} />
-        <span className="text-[24px]">Watchalong</span>
-        <button
-          onClick={() => setIsAddCardModalOpen(true)}
-          className="border-solid border-[1px] border-[#ccc] p-[6px] bg-[#eee] ml-[25px] rounded-[4px]"
-        >
-          Add Show
-        </button>
-        <Image
-          src="/question-line.svg"
-          alt="icon"
-          width={32}
-          height={32}
-          className="ml-auto cursor-pointer"
-          onClick={() => setIsHelpModalOpen(true)}
-        />
+      <header
+        className={classNames(
+          'sticky w-full flex flex-col items-center border-b-[1px] border-b-solid border-b-[#dddee1]',
+          {
+            'h-[106px]': !!notification,
+            'h-[60px]': !notification
+          }
+        )}
+      >
+        {notification && (
+          <div
+            className={classNames(
+              'w-full h-[56px] flex items-center px-[60px]',
+              {
+                'bg-[#d2e6ff]': notification?.type === 'info',
+                'text-[rgb(59,130,246)]': notification?.type === 'info'
+              }
+            )}
+          >
+            {notification?.message}
+          </div>
+        )}
+        <div className="w-full flex p-[10px] gap-[10px]">
+          <Image src="/dashboard-line.svg" alt="icon" width={32} height={32} />
+          <span className="text-[24px]">Watchalong</span>
+          <button
+            onClick={() => setIsAddCardModalOpen(true)}
+            className="border-solid border-[1px] border-[#ccc] p-[6px] bg-[#eee] ml-[25px] rounded-[4px]"
+          >
+            Add Show
+          </button>
+          <Image
+            src="/question-line.svg"
+            alt="icon"
+            width={32}
+            height={32}
+            className="ml-auto cursor-pointer"
+            onClick={() => setIsHelpModalOpen(true)}
+          />
+        </div>
       </header>
-      <main className="overflow-auto h-[calc(100%-60px)] relative">
-        {isAuthorized && <KanbanBoard openedCardId={openedCardId} />}
+      <main
+        className={classNames('overflow-auto relative', {
+          'h-[calc(100%-116px)]': !!notification,
+          'h-[calc(100%-60px)]': !notification
+        })}
+      >
+        {isAuthorized && (
+          <KanbanBoard
+            openedCardId={openedCardId}
+            showNotification={showNotification}
+          />
+        )}
       </main>
       <Modal
         open={isAddCardModalOpen}
@@ -196,4 +232,15 @@ export default function Home() {
       </Modal>
     </>
   );
+
+  function showNotification(notification: Notification | null) {
+    setNotification(
+      notification
+        ? { type: notification.type, message: notification.message }
+        : null
+    );
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  }
 }

@@ -1,1 +1,1 @@
-export { usePostBoard } from './usePostBoard';
+export { useBoardApiRequests } from './board-api-requests';

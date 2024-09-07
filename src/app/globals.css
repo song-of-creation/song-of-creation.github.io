@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('react-responsive-modal/styles.css');
+
 @layer base {
   @font-face {
     font-family: 'Roboto';
@@ -14,6 +16,10 @@
   html {
     font-family: 'Roboto';
   }
+}
+
+.react-responsive-modal-root .react-responsive-modal-overlay {
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .react-kanban-board > div {
