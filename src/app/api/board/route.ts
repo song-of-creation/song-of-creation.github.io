@@ -8,10 +8,8 @@ type Error = {
 
 export async function GET() {
   try {
-    const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER_NAME}.mm6bn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
     // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-    const client = new MongoClient(uri, {
+    const client = new MongoClient(process.env.DB_COLLECTION_STRING!, {
       serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
@@ -27,7 +25,7 @@ export async function GET() {
     try {
       const board = await collection.find({}).toArray();
       await client.close();
-      return NextResponse.json(board[0], { status: 200 });
+      return NextResponse.json(board?.[0] ?? {}, { status: 200 });
     } catch (error) {
       await client.close();
       return NextResponse.json(
@@ -45,10 +43,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER_NAME}.mm6bn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
     // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-    const client = new MongoClient(uri, {
+    const client = new MongoClient(process.env.DB_COLLECTION_STRING!, {
       serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
