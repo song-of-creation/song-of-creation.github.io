@@ -97,7 +97,7 @@ export function KanbanBoard({
     return (
       <GridLoader
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-        color="#000"
+        color="#101720"
         size={25}
         aria-label="Loading Spinner"
         loading
@@ -110,7 +110,7 @@ export function KanbanBoard({
       <ControlledBoard
         renderColumnHeader={(column) => {
           return (
-            <span className="uppercase truncate block text-[#777] font-bold pl-[5px] pt-[10px] pb-[20px]">
+            <span className="uppercase truncate block font-bold pl-[5px] pt-[10px] pb-[20px]">
               {column?.title}
               <span className="ml-[10px]">{column?.cards?.length}</span>
             </span>
@@ -121,7 +121,7 @@ export function KanbanBoard({
           return (
             <div
               className={classNames(
-                'p-[10px] w-full mb-[10px] rounded-[4px] hover:bg-[#e6f4ff]',
+                'p-[10px] w-full mb-[10px] rounded-[12px] md:rounded-[4px] hover:bg-[#e6f4ff]',
                 {
                   'bg-[#e6f4ff]': editingCard?.id === card.id,
                   'bg-[#fff]': editingCard?.id !== card.id
@@ -351,9 +351,11 @@ export function KanbanBoard({
         onClose={() => {
           setEditingCard(null);
           setEditingColumn(null);
+          router.replace(pathname);
         }}
         classNames={{
-          modal: 'w-[600px] [&&]:max-w-[calc(100%-2.4rem)] rounded-[4px]',
+          modal:
+            'w-[600px] [&&]:max-w-[calc(100%-2.4rem)] rounded-[12px] md:rounded-[4px]',
           modalContainer: '[&&]:overflow-x-auto'
         }}
         center
@@ -382,6 +384,7 @@ export function KanbanBoard({
             );
             setEditingCard(null);
             setEditingColumn(null);
+            router.replace(pathname);
           }}
           className="flex flex-col w-full items-start gap-[15px]"
         >

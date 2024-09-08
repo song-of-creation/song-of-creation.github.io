@@ -15,6 +15,7 @@
 
   html {
     font-family: 'Roboto';
+    color: #101720;
   }
 }
 
@@ -26,14 +27,22 @@
   width: 100%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+
+  @media screen and (max-width: 767px) {
+    grid-template-columns: repeat(3, 100%);
+  }
 }
 
-.react-kanban-board > div > div {
+.react-kanban-board .react-kanban-column {
   min-width: 50px !important;
   padding: 5px;
   border-radius: 4px;
+
+  @media screen and (max-width: 767px) {
+    border-radius: 12px;
+  }
 }
 
-.react-kanban-board > div > div > div:nth-child(2) > div > div {
+.react-kanban-board .react-kanban-column > div:nth-child(2) > div > div {
   width: 100%;
 }
